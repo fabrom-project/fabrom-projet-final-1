@@ -28,31 +28,19 @@ export const UserAvatar = ({ user }: UserAvatarProps) => {
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-
     const fetchProfile = async () => {
-      try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("first_name, last_name, avatar_url")
-          .eq("id", user.id)
-          .maybeSingle();
-        
-        if (mounted && data) {
-          setProfile(data);
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setProfile(data);
       }
     };
 
-    if (user?.id) {
-      fetchProfile();
-    }
-
-    return () => {
-      mounted = false;
-    };
+    fetchProfile();
   }, [user.id]);
 
   const getInitials = () => {

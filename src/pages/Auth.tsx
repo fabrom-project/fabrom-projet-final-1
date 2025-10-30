@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import fabromLogo from "@/assets/fabrom-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -19,13 +20,13 @@ const Auth = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/editor");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        navigate("/");
+        navigate("/editor");
       }
     });
 
@@ -74,10 +75,20 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>FABROM</CardTitle>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      {/* Glow effect */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-[600px] h-[600px] rounded-full bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 opacity-30 blur-3xl" />
+      </div>
+      
+      <Card className="w-full max-w-md relative z-10 bg-card/95 backdrop-blur-sm border-border/50">
+        <CardHeader className="text-center">
+          <img 
+            src={fabromLogo} 
+            alt="FABROM" 
+            className="h-12 mx-auto mb-4"
+          />
+          <CardTitle className="text-2xl">FABROM</CardTitle>
           <CardDescription>Éditeur de code IA</CardDescription>
         </CardHeader>
         <CardContent>

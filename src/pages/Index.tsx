@@ -32,10 +32,7 @@ const Index = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-      const timer = setTimeout(() => {
-        navigate("/auth");
-      }, 100);
-      return () => clearTimeout(timer);
+      navigate("/auth");
     }
   }, [user, loading, navigate]);
 
