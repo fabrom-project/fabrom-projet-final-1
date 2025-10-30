@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChatInterface } from "@/components/ChatInterface";
 import { CodeEditor } from "@/components/CodeEditor";
 import { PreviewPane } from "@/components/PreviewPane";
@@ -11,8 +12,12 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import fabromLogo from "@/assets/fabrom-logo.png";
+import { useAuth } from "@/hooks/useAuth";
+import { UserAvatar } from "@/components/UserAvatar";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [code, setCode] = useState("");
   const [showPreview, setShowPreview] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -24,6 +29,12 @@ const Index = () => {
   const [filesKey, setFilesKey] = useState(0);
   const [showFileManager, setShowFileManager] = useState(false);
   const [showAssistant, setShowAssistant] = useState(true);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
 
   const saveCodeToFile = async (fileName: string = currentFile, fileCode: string = code) => {
     if (!fileCode || !directoryHandleRef.current) {
@@ -210,6 +221,18 @@ const Index = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
       {/* Header - Visible on all screens */}
@@ -241,6 +264,7 @@ const Index = () => {
             <span className="hidden md:inline">📁 Dossier</span>
             <span className="md:hidden">📁</span>
           </Button>
+          <UserAvatar user={user} />
           <Popover open={showFileManager} onOpenChange={setShowFileManager}>
             <PopoverTrigger asChild>
               <Button
