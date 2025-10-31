@@ -7,7 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { z } from "zod";
 import fabromLogo from "@/assets/fabrom-logo.png";
+
+const signUpSchema = z.object({
+  email: z.string().email("Adresse email invalide").max(255, "L'email doit contenir moins de 255 caractères"),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères").max(72, "Le mot de passe doit contenir moins de 72 caractères"),
+  firstName: z.string().trim().max(100, "Le prénom doit contenir moins de 100 caractères").optional(),
+  lastName: z.string().trim().max(100, "Le nom doit contenir moins de 100 caractères").optional(),
+});
+
+const signInSchema = z.object({
+  email: z.string().email("Adresse email invalide").max(255, "L'email doit contenir moins de 255 caractères"),
+  password: z.string().min(1, "Le mot de passe est requis"),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -35,16 +48,31 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate input
+    const validation = signUpSchema.safeParse({
+      email: email.trim(),
+      password,
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
 
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: validation.data.email,
+      password: validation.data.password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: {
-          first_name: firstName,
-          last_name: lastName,
+          first_name: validation.data.firstName,
+          last_name: validation.data.lastName,
         },
       },
     });
@@ -60,11 +88,24 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate input
+    const validation = signInSchema.safeParse({
+      email: email.trim(),
+      password,
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: validation.data.email,
+      password: validation.data.password,
     });
 
     setLoading(false);
