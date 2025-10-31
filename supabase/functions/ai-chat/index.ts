@@ -46,7 +46,7 @@ Multi-page applications:
 - Use relative paths for links and resources
 - Each page should be complete and self-contained
 - Maintain a consistent header/navigation across pages
-- For images, use the "upload/" folder path: <img src="upload/image.jpg">
+- For images, use the "upload/" folder path: <img src="./upload/image.jpg">
 
 Code structure and file management:
 - Analyze existing files in the directory to understand the project structure
