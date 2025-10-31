@@ -6,6 +6,7 @@ import { Send, Sparkles, ImagePlus, ChevronLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { UserAvatar } from "@/components/UserAvatar";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,6 +23,7 @@ interface ChatInterfaceProps {
   onConversationUpdate: (id: string) => void;
   onFileCreate: (fileName: string, content: string) => void;
   onToggleVisibility?: () => void;
+  user?: any;
 }
 
 export function ChatInterface({ 
@@ -33,7 +35,8 @@ export function ChatInterface({
   currentFile,
   conversationId,
   onConversationUpdate,
-  onFileCreate
+  onFileCreate,
+  user
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -52,11 +55,10 @@ export function ChatInterface({
   }, [messages]);
 
   const saveConversation = async (newMessages: Message[], files: Record<string, string>) => {
-    if (!directoryHandle) return;
+    if (!directoryHandle || !user) return;
 
     try {
-      const userId = localStorage.getItem("fabrom_user_id") || crypto.randomUUID();
-      localStorage.setItem("fabrom_user_id", userId);
+      const userId = user.id;
 
       if (!conversationId) {
         // Create new conversation
@@ -374,15 +376,23 @@ export function ChatInterface({
           <Sparkles className="w-4 h-4 text-white" />
           <h2 className="text-sm font-semibold text-white">Assistant IA</h2>
         </div>
-        {onToggleVisibility && (
-          <button
-            onClick={onToggleVisibility}
-            className="text-white hover:bg-white/10 p-1 rounded transition-colors"
-            title="Masquer l'assistant"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Mobile: Show user avatar in assistant header */}
+          {isMobile && user && (
+            <div className="md:hidden">
+              <UserAvatar user={user} />
+            </div>
+          )}
+          {onToggleVisibility && (
+            <button
+              onClick={onToggleVisibility}
+              className="text-white hover:bg-white/10 p-1 rounded transition-colors"
+              title="Masquer l'assistant"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Messages */}

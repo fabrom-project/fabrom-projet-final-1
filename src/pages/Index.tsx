@@ -264,7 +264,6 @@ const Index = () => {
             <span className="hidden md:inline">📁 Dossier</span>
             <span className="md:hidden">📁</span>
           </Button>
-          <UserAvatar user={user} />
           <Popover open={showFileManager} onOpenChange={setShowFileManager}>
             <PopoverTrigger asChild>
               <Button
@@ -310,6 +309,10 @@ const Index = () => {
             <Code2 className="w-3 h-3 md:w-4 md:h-4" />
             <span className="hidden md:inline">{showEditor ? "Masquer" : "Afficher"} Code</span>
           </Button>
+          {/* Desktop: Avatar at the very end */}
+          <div className="hidden md:block">
+            <UserAvatar user={user} />
+          </div>
         </div>
       </header>
 
@@ -398,6 +401,7 @@ const Index = () => {
                 onConversationUpdate={setConversationId}
                 onFileCreate={handleFileCreate}
                 isMobile={true}
+                user={user}
               />
             )}
             {mobileView === "preview" && (
